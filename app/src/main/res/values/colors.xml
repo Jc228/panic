@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#01579B</color>
+    <color name="colorPrimaryDark">#0D47A1</color>
+    <color name="colorAccent">#01579B</color>
+    <color name="colorPeligro">#F44336</color>
+    <color name="colorBotonPresionado">#B3E5FC</color>
+    <color name="colorBotonPressPeligro">#FFCDD2</color>
+    <color name="colorBotonPresionadoReg">#B2DFDB</color>
+    <color name="colorBlanco">#FFFFFF</color>
+    <color name="colorBotonReg">#558B2F</color>
+</resources>

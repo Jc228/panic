@@ -1,0 +1,57 @@
+<resources>
+    <string name="app_name" translatable="false">SmartAlert UCE</string>
+    <string name="txt1">Ingrese un email...</string>
+    <string name="txt2">Ingrese una clave...</string>
+    <string name="txtUser">Bienvenido</string>
+    <string name="txtNom">Nombre y Apellido...</string>
+    <string name="recuperar">Recupera tu cuenta</string>
+    <string name="cambiarClave">Cambiar contraseña</string>
+    <string name="enviar">Enviar</string>
+
+    <string name="clvActual">Contraseña actual...</string>
+    <string name="clv1">Nueva contraseña...</string>
+    <string name="clv2">Repita contraseña...</string>
+    <string name="cambiarClv">Cambiar</string>
+
+    <string name="button">Registrar Usuario</string>
+    <string name="buttonRegistro">Registrarse</string>
+    <string name="buttonLogin">Loguearse</string>
+    <string name="buttonPeligro">! Ayuda !</string>
+    <string name="buttonCerrarSesion">Cerrar Sesion</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="configs">Configuraciones</string>
+    <string name="title_activity_reg_tabb">Registro</string>
+    <string name="tab_text_1">Datos</string>
+    <string name="tab_text_2">Verificacion</string>
+    <string name="tab_text_3">Foto</string>
+    <string name="action_settings">Configuracion</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="registro">Datos de Registro</string>
+    <string name="btnTomar">Foto</string>
+    <string name="btnSig">Siguiente</string>
+    <string name="txtVeri1">Enviamos un mail de verificación al siguiente correo</string>
+    <string name="txtVeri3">Ingrese en código para habilitar su cuenta:</string>
+    <string name="txtCod">Código de verificación...</string>
+    <string name="btnVeri">Verificar</string>
+    <string name="btnOlvido">¿Olvidó su contraseña?</string>
+    <string name="txtVeri4">Enviar nuevo código</string>
+    <string name="title_activity_menu">SmartAlert UCE</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">SmartAlert UCE</string>
+    <string name="nav_header_subtitle">alert_uce@uce.edu.ec</string>
+    <string name="nav_header_desc">Navigation header</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="title_activity_menu_map">SmartAlert UCE</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_tools">Tools</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_send">Send</string>
+</resources>

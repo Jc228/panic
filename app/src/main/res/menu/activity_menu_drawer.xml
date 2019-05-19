@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_foto"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Cambiar fotografía"
+            android:theme="@style/BotonesView"
+            />
+        <item
+            android:id="@+id/nav_instrucciones"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Activar Cuenta"
+            android:theme="@style/BotonesView"/>
+
+        <item
+            android:id="@+id/nav_cambiar"
+            android:icon="@drawable/ic_menu_send"
+            android:title="Cambiar Contraseña"
+            android:theme="@style/BotonesView" />
+    </group>
+    <item android:title="Salir">
+        <menu>
+            <item
+                android:id="@+id/nav_cerrar"
+                android:title="Cerrar Sesion"
+                android:theme="@style/BotonesView"/>
+        </menu>
+    </item>
+
+</menu>

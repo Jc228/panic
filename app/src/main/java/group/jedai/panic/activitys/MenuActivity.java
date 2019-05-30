@@ -45,6 +45,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import group.jedai.panic.R;
+import group.jedai.panic.background.AdmAlerta;
 import group.jedai.panic.utils.AdmSession;
 
 public class MenuActivity extends AppCompatActivity
@@ -65,7 +66,7 @@ public class MenuActivity extends AppCompatActivity
     private double latitud;
     private double longitud;
     private AdmSession admSession;
-//    private AdmAlerta admAlerta;
+    private AdmAlerta admAlerta;
     private static final String CHANNEL_ID = "canal1";
     private static final int ID = 51623;
 
@@ -80,8 +81,8 @@ public class MenuActivity extends AppCompatActivity
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         admSession = new AdmSession(getApplicationContext());
+        admAlerta= new AdmAlerta(getApplicationContext());
 
-        //        admAlerta = new AdmAlerta(getApplicationContext());
 
 //        textView = (TextView) findViewById(R.id.txtBienvenidaF);
         nombre = getIntent().getStringExtra("nombre");
@@ -279,21 +280,22 @@ public class MenuActivity extends AppCompatActivity
     }
 
     public void emitirUbicacion() {
-        final double[] lat = {0.0};
-//        lat[0] = admAlerta.emitirUbicacion(idUser, tipo, latitud, longitud, mMap);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (lat[0] == 0.0) {
-                    start();
-//                    lat[0] = admAlerta.emitirUbicacion(idUser, tipo, latitud, longitud, mMap);
-                }
-            }
-        }).start();
+admAlerta.enviarAlerta();
+//        final double[] lat = {0.0};
+////        lat[0] = admAlerta.emitirUbicacion(idUser, tipo, latitud, longitud, mMap);
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while (lat[0] == 0.0) {
+//                    start();
+////                    lat[0] = admAlerta.emitirUbicacion(idUser, tipo, latitud, longitud, mMap);
+//                }
+//            }
+//        }).start();
     }
 
     public void stopAlerta() {
-//        admAlerta.stopAlerta();
+        admAlerta.stopAlerta();
     }
 
 

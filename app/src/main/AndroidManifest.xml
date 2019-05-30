@@ -20,7 +20,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activitys.CambiarPassActivity"></activity>
+        <receiver
+            android:name=".utils.MyReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
+
+        <service
+            android:name=".background.Alertas"
+            android:exported="false" />
+        <service
+            android:name=".background.AdmAlerta"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".activitys.CambiarPassActivity" />
         <activity android:name=".activitys.VerificacionActivity" />
         <activity android:name=".activitys.FotoActivity" />
         <activity android:name=".activitys.RegistroActivity" />

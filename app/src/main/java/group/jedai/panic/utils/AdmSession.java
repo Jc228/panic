@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import group.jedai.panic.activitys.MainActivity;
 import group.jedai.panic.activitys.MenuActivity;
 import group.jedai.panic.activitys.MenuMapActivity;
@@ -57,7 +60,6 @@ public class AdmSession {
 
     public void redireccionarInicio() {
         if (sharedPreferences.getString("tipo", null).equalsIgnoreCase("guardia")) {
-//            Intent intent = new Intent(context, MapsActivity.class);
             Intent intent = new Intent(context, MenuMapActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//para versiones menores a android 6
             intent.putExtra("nombre", sharedPreferences.getString("nombre", null));
@@ -67,8 +69,8 @@ public class AdmSession {
             intent.putExtra("activo", sharedPreferences.getBoolean("activo", false));
             Log.i("UserLogueado", sharedPreferences.getString("nombre", null));
             context.startActivity(intent);
+
         } else {
-//            Intent intent = new Intent(context, BienvenidaActivity.class);
             Intent intent = new Intent(context, MenuActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//para versiones menores a android 6
             intent.putExtra("nombre", sharedPreferences.getString("nombre", null));
@@ -81,11 +83,22 @@ public class AdmSession {
         }
     }
 
+    public Map<String,Object> getDatos(){
+        Map<String, Object> map = new HashMap<>();
+        map.put("tipo",sharedPreferences.getString("tipo", null));
+        map.put("nombre",sharedPreferences.getString("nombre", null));
+        map.put("idUser",sharedPreferences.getString("idUser", null));
+        map.put("email",sharedPreferences.getString("email", null));
+        map.put("longitud",Double.valueOf(sharedPreferences.getString("longitud", null)));
+        map.put("latitud",Double.valueOf(sharedPreferences.getString("latitud", null)));
+return map;
+    }
     public void borrarSesion() {
         editPref.clear();
         editPref.commit();
         Intent intent = new Intent(context, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//para versiones menores a android 6
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        //para versiones menores a android 6
 //        intent.putExtra("nombre", sharedPreferences.getString("nombre", null));
 //        intent.putExtra("tipo", sharedPreferences.getString("tipo", null));
 //        intent.putExtra("idUser", sharedPreferences.getString("idUser", null));

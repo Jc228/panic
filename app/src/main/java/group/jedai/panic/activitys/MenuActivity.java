@@ -43,6 +43,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.onesignal.OneSignal;
 
 import group.jedai.panic.R;
 import group.jedai.panic.background.AdmAlerta;
@@ -83,18 +84,22 @@ public class MenuActivity extends AppCompatActivity
         admSession = new AdmSession(getApplicationContext());
         admAlerta= new AdmAlerta(getApplicationContext());
 
-
-//        textView = (TextView) findViewById(R.id.txtBienvenidaF);
         nombre = getIntent().getStringExtra("nombre");
         tipo = getIntent().getStringExtra("tipo");
         idUser = getIntent().getStringExtra("idUser");
         email = getIntent().getStringExtra("email");
         activo = getIntent().getBooleanExtra("activo", false);
+
+        //OneSignal
+        OneSignal.startInit(this)
+                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+                .unsubscribeWhenNotificationsAreDisabled(true)
+                .init();
+        OneSignal.sendTag("idUser", idUser);
+
         if (activo) {
-//            textView.setText("!!Bienvenido " + nombre + " !!");
             Toast.makeText(this, "!!Bienvenido " + nombre + " !!", Toast.LENGTH_SHORT).show();
         } else {
-//            textView.setText("!!Bienvenido " + nombre + "recuerde que su cuenta no esta acticada se le recomienda activarla " + " !!");
             Toast.makeText(this, "Su cuenta no esta acticada se le recomienda activarla", Toast.LENGTH_SHORT).show();
 
         }
@@ -250,9 +255,10 @@ public class MenuActivity extends AppCompatActivity
         map.clear();
         LatLng ubicacion = new LatLng(latitud, longitud);
         LatLng ubicacionG = new LatLng(latitudG, longitudG);
-//        LatLng ubicacionG = new LatLng(-0.211100000000, -78.494000000000);
         map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.hombre)).position(ubicacion).title(nombre));
-        map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacionG).title(nombre));
+//        if(longitud !=0.0 && latitud != 0.0 ) {
+            map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacionG).title(nombre));
+//        }
         camera = CameraUpdateFactory.newLatLngZoom(ubicacion, 16);
         map.animateCamera(camera);
     }
@@ -280,18 +286,18 @@ public class MenuActivity extends AppCompatActivity
     }
 
     public void emitirUbicacion() {
-admAlerta.enviarAlerta();
-//        final double[] lat = {0.0};
-////        lat[0] = admAlerta.emitirUbicacion(idUser, tipo, latitud, longitud, mMap);
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                while (lat[0] == 0.0) {
-//                    start();
-////                    lat[0] = admAlerta.emitirUbicacion(idUser, tipo, latitud, longitud, mMap);
-//                }
-//            }
-//        }).start();
+//admAlerta.enviarAlerta();
+        final double[] lat = {0.0};
+        lat[0] = admAlerta.emitirUbicacion(idUser, tipo, latitud, longitud, true, mMap);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (lat[0] == 0.0) {
+                    start();
+                    lat[0] = admAlerta.emitirUbicacion(idUser, tipo, latitud, longitud, true, mMap);
+                }
+            }
+        }).start();
     }
 
     public void stopAlerta() {

@@ -77,7 +77,7 @@ public class StompClient extends WebSocketListener {
         message.put("destination", topic);
         message.put("content-type", "application/json;charset=UTF-8");
         message.setContent(content);
-        this.webSocket.send(StompMessageSerializer.serialize(message));
+        //this.webSocket.send(StompMessageSerializer.serialize(message));
     }
 
     private void sendConnectMessage(WebSocket webSocket) {

@@ -1,3 +1,22 @@
+buildscript {
+    repositories {
+        maven { url 'https://plugins.gradle.org/m2/'}
+    }
+    dependencies {
+        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.11.0, 0.99.99]'
+    }
+}
+apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
+
+repositories {
+    maven { url 'https://maven.google.com' }
+}
+
+
+
+
+
+
 apply plugin: 'com.android.application'
 
 android {
@@ -9,6 +28,12 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        //OneSignal
+        manifestPlaceholders = [
+                onesignal_app_id: '2ba7353e-2b75-4597-9e77-689f600c0b75',
+                // Project number pulled from dashboard, local value is ignored.
+                onesignal_google_project_number: 'REMOTE'
+        ]
     }
     buildTypes {
         release {
@@ -49,10 +74,9 @@ dependencies {
     //noinspection GradleCompatible
     implementation 'com.google.android.gms:play-services:12.0.1'
 
-//    implementation ('io.socket:engine.io-client:1.0.0') {
-//        // excluding org.json which is provided by Android
-//        exclude group: 'org.json', module: 'json'
-//    }
 //    implementation 'com.google.android.gms:play-services-maps:15.0.1'
 
+    //OneSignal
+    implementation 'com.onesignal:OneSignal:[3.9.1, 3.99.99]'
+    implementation 'com.squareup.okhttp3:okhttp:3.6.0'
 }

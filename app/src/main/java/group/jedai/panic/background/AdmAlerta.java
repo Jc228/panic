@@ -5,9 +5,11 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -15,8 +17,12 @@ import com.google.android.gms.maps.GoogleMap;
 
 import org.joda.time.LocalDateTime;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,13 +43,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AdmAlerta extends Service {
 
-    private double longitud;
-    private double latitud;
-    private String nombre;
-    private String tipo;
-    private String idUser;
-
-    TimerTask timerTask;
+    TimerTask timerTaskguardia;
+    TimerTaskAlerta timerTask;
     final Handler handler = new Handler();
     Timer t = new Timer();
     private int nCounter = 0;
@@ -56,8 +57,6 @@ public class AdmAlerta extends Service {
     private AdmSession admSession;
 
     private MessageService messageService = new MessageService();
-
-//    private SocketSrv socketSrv;
 
     public AdmAlerta() {
     }
@@ -79,7 +78,7 @@ public class AdmAlerta extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("Servicio", "Servicio Alertas Iniciado");
+        Log.d("Servicio", "Servicio AlertasService Iniciado");
         Map<String, Object> map = new HashMap<>();
         admSession = new AdmSession(getApplicationContext());
         map = admSession.getDatos();
@@ -88,10 +87,8 @@ public class AdmAlerta extends Service {
         String tipo = (String) map.get("tipo");
         Double latitud = (Double) map.get("latitud");
         Double longitud = (Double) map.get("longitud");
-        emitirUbicacionGuardia(idUser, tipo, latitud ,longitud);
-
-//        NotificacionThread notificacionThread = new NotificacionThread(idUser,tipo,latitud,longitud, getApplicationContext());
-//new Thread(notificacionThread).start();
+        //controlar si es guardia enviar notificacion sino enviar alerta
+        emitirUbicacionGuardia(idUser, tipo, latitud, longitud);
         return START_STICKY;
     }
 
@@ -104,49 +101,47 @@ public class AdmAlerta extends Service {
                 .build();
 
         if (latitud != 0.0) {
-                        timerTask = new TimerTask() {
-                            @Override
-                            public void run() {
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        nCounter++;
-                                            NotificacionSrv notificacionSrv = retrofit.create(NotificacionSrv.class);
-                                            final Notificacion notificacion = new Notificacion(idUser, LocalDateTime.now().toString(), latitud, longitud);
-                                            Call<Notificacion> notificacionCall = notificacionSrv.addNotificacion(notificacion);
-                                            notificacionCall.enqueue(new Callback<Notificacion>() {
-                                                @Override
-                                                public void onResponse(Call<Notificacion> call, Response<Notificacion> response) {
-                                                    if (response.isSuccessful()) {
+            timerTaskguardia = new TimerTask() {
+
+                @Override
+                public void run() {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            nCounter++;
+                            NotificacionSrv notificacionSrv = retrofit.create(NotificacionSrv.class);
+                            final Notificacion notificacion = new Notificacion(idUser, LocalDateTime.now().toString(), latitud, longitud);
+                            Call<Notificacion> notificacionCall = notificacionSrv.addNotificacion(notificacion);
+                            notificacionCall.enqueue(new Callback<Notificacion>() {
+                                @Override
+                                public void onResponse(Call<Notificacion> call, Response<Notificacion> response) {
+                                    if (response.isSuccessful()) {
                                         Log.i("Servicio", notificacion.getIdUsuario());
-                                                        Toast.makeText(getApplicationContext(), "Ubicacion actualizada", Toast.LENGTH_LONG).show();
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onFailure(Call<Notificacion> call, Throwable t) {
-                                                    Log.i("Servicio", notificacion.getIdUsuario());
-
-                                                    Toast.makeText(getApplicationContext(), "Ocurrio un problema", Toast.LENGTH_LONG).show();
-                                                }
-                                            });
+                                        Toast.makeText(context, "Ubicacion actualizada", Toast.LENGTH_LONG).show();
                                     }
-                                });
-                            }
-                        };
-                        t.purge();
-                            t.schedule(timerTask, 500, 1000);
+                                }
+
+                                @Override
+                                public void onFailure(Call<Notificacion> call, Throwable t) {
+                                    Log.i("Servicio", notificacion.getIdUsuario());
+
+                                    Toast.makeText(context, "Ocurrio un problema", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    });
+                }
+            };
+            t.purge();
+            t.schedule(timerTaskguardia, 500, 100000);
         }
     }
 
-    public void enviarAlerta(){
-            messageService.connect();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    public void enviarAlerta() {
+        messageService.connect();
+        if (messageService.isConnected()) {
+            sendNotification("");
         }
-        messageService.send(new Alerta("user","27/05/2019",123.024,1325.0212,0.154,213.0215,"123isad","21/06/2010","14/04/2020", true));
     }
 
     @Override
@@ -155,166 +150,65 @@ public class AdmAlerta extends Service {
     }
 
 
-
-    String alertaId = null;
-
     @TargetApi(Build.VERSION_CODES.O)
-    public double emitirUbicacion(final String idUser, final String tipo, final double latitud, final double longitud, final GoogleMap googleMap) {
-//        Intent intent = new Intent(context, AdmAlerta.class);
-//        context.startService(intent);
+    public double emitirUbicacion(final String idUser, final String tipo, final double latitud, final double longitud, final boolean activo, final GoogleMap googleMap) {
         if (latitud != 0.0) {
-            timerTask = new TimerTask() {
+            timerTask = new TimerTaskAlerta() {
+
+                private boolean emitir = true;
+                private boolean enviar = true;
+                private String alertaId = null;
+                private TimerTaskAlerta yomismo = this;
+
+                @Override
+                public void detenme() {
+                    this.emitir = false;
+                }
+
                 @Override
                 public void run() {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
                             nCounter++;
-                            if (!tipo.equalsIgnoreCase("guardia")) {
+                            if (!tipo.equalsIgnoreCase("guardia") && enviar) {
+                                if (!emitir) {
+                                    enviar = false;
+                                    yomismo.cancel();
+                                }
                                 AlertaSrv alertaSrv = retrofit.create(AlertaSrv.class);
-                                final Alerta alerta = new Alerta(idUser, LocalDateTime.now().toString(), latitud, longitud, null, null, null, null, null, true);
+                                final Alerta alerta = new Alerta(idUser, LocalDateTime.now().toString(), latitud, longitud, null, null, null, null, null, emitir);
                                 alerta.setId(alertaId);
                                 Call<Alerta> alertaCall = alertaSrv.addAlerta(alerta);
                                 alertaCall.enqueue(new Callback<Alerta>() {
                                     @Override
                                     public void onResponse(Call<Alerta> call, Response<Alerta> response) {
                                         if (response.isSuccessful()) {
-                                            Toast.makeText(getApplicationContext(), "Alerta enviada", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(context, "Alerta enviada", Toast.LENGTH_LONG).show();
                                             Alerta alert = response.body();
                                             alertaId = alert.getId();
-//                                            if (alert.getIdGuardia() != null) {
-                                            //crear notificacion a los guardias
-//                                                notificacion(alert);
-//                                                System.out.printf("notificar guadias");
-//                                            socketSrv.connect();
-//                                            if (socketSrv.isConnected()) {
-//                                                socketSrv.send(alert);
-//                                                Log.i("SOCKET:", alert.getId() + "; " + alert.getLatitude() + "; " + alert.getLongitude());
-//                                            } else {
-//                                                Log.i("SOCKET:", "No se pudo conectar a socket");
-//                                            }
+                                            if (alert.getIdGuardia() != null) {
+//                                            crear notificacion a los guardias
+                                                messageService.connect();
+                                                if (messageService.isConnected()) {
+                                                    sendNotification(alert.getIdGuardia());
+                                                    Log.i("SOCKET:", "Conectado a socket");
+                                                } else {
+                                                    Log.i("SOCKET:", "No se pudo conectar a socket");
+                                                }
 
-                                            if ((alert.getLongitudeG() != null) || (alert.getLatitudeG() != null)) {
-                                                menuActivity.onMapActualizar(googleMap, alert.getLatitude(), alert.getLongitude(), alert.getLatitudeG(), alert.getLongitudeG());
-                                                menuMapActivity.onMapActualizar(googleMap, alert.getLatitude(), alert.getLongitude(), alert.getLatitudeG(), alert.getLongitudeG());
-//                                                    menuMapActivity.onMapActualizar(googleMap, alert.getLatitude(), alert.getLongitude(), alert.getLatitudeG() + (nCounter * 0.0000028884), alert.getLongitudeG() + (nCounter * 0.0000673232));
-//                                                notificacion(alert);
-//                                                    if(nCounter == 2) {
-//                                                Intent service = new Intent(AdmAlerta.this, ListenerNotificacion.class);
-//                                                    service.putExtra("latitud",alert.getLatitude());
-//                                                    service.putExtra("longitud",alert.getLongitude());
-//                                                    service.putExtra("latitudG",alert.getLatitudeG());
-//                                                    service.putExtra("longitudG",alert.getLongitudeG());
-                                                Toast.makeText(getApplicationContext(), "Va a servicio", Toast.LENGTH_LONG);
-                                                //  startService(service);
-//                                                    }
+                                                if ((alert.getLongitudeG() != null) || (alert.getLatitudeG() != null)) {
+                                                    menuActivity.onMapActualizar(googleMap, alert.getLatitude(), alert.getLongitude(), alert.getLatitudeG(), alert.getLongitudeG());
+                                                }
+//                                                else if(emitir == false){
+//                                                    menuActivity.onMapActualizar(googleMap, alert.getLatitude(), alert.getLongitude(), 0.0, 0.0);
+//                                                }
                                             }
-
-//                                            }
                                         }
                                     }
 
                                     @Override
                                     public void onFailure(Call<Alerta> call, Throwable t) {
-                                        Toast.makeText(getApplicationContext(), "Ocurrio un problema", Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            } else {
-                                NotificacionSrv notificacionSrv = retrofit.create(NotificacionSrv.class);
-                                final Notificacion notificacion = new Notificacion(idUser, LocalDateTime.now().toString(), latitud, longitud);
-                                Call<Notificacion> notificacionCall = notificacionSrv.addNotificacion(notificacion);
-                                notificacionCall.enqueue(new Callback<Notificacion>() {
-                                    @Override
-                                    public void onResponse(Call<Notificacion> call, Response<Notificacion> response) {
-                                        if (response.isSuccessful()) {
-                                            Toast.makeText(getApplicationContext(), "Ubicacion actualizada", Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<Notificacion> call, Throwable t) {
-                                        Toast.makeText(getApplicationContext(), "Ocurrio un problema", Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
-                        }
-                    });
-                }
-            };
-            t.purge();
-            if (!tipo.equalsIgnoreCase("guardia")) {
-                t.schedule(timerTask, 500, 50000);
-            } else {
-                t.schedule(timerTask, 500, 100000);
-//                t.schedule(timerTask, 500, 3000);
-            }
-            return latitud;
-        } else {
-            return 0.0;
-        }
-    }
-
-    public void stopAlerta() {
-        if (timerTask != null) {
-            timerTask.cancel();
-            t.purge();
-            nCounter = 0;
-        }
-    }
-
-
-
-
-}
-
-class NotificacionThread extends Thread {
-    String idUser;
-    String tipo;
-    Double latitud;
-    Double longitud;
-    TimerTask timerTask;
-    final Handler handler = new Handler();
-    Timer t = new Timer();
-    private int nCounter = 0;
-    private Retrofit retrofit;
-    private Context context;
-
-    NotificacionThread(String idUser, String tipo, double latitud, double longitud, Context context){
-        this.idUser = idUser;
-        this.tipo = tipo;
-        this.latitud = latitud;
-        this.longitud = longitud;
-        this.context = context;
-        retrofit = new Retrofit.Builder()
-                .baseUrl(Constantes.URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-    }
-
-    @Override
-    public void run() {
-        if (latitud != 0.0) {
-            timerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            nCounter++;
-                            if (tipo.equalsIgnoreCase("guardia")) {
-                                NotificacionSrv notificacionSrv = retrofit.create(NotificacionSrv.class);
-                                final Notificacion notificacion = new Notificacion(idUser, LocalDateTime.now().toString(), latitud, longitud);
-                                Call<Notificacion> notificacionCall = notificacionSrv.addNotificacion(notificacion);
-                                notificacionCall.enqueue(new Callback<Notificacion>() {
-                                    @Override
-                                    public void onResponse(Call<Notificacion> call, Response<Notificacion> response) {
-                                        if (response.isSuccessful()) {
-                                            Toast.makeText(context, "Ubicacion actualizada", Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<Notificacion> call, Throwable t) {
                                         Toast.makeText(context, "Ocurrio un problema", Toast.LENGTH_LONG).show();
                                     }
                                 });
@@ -324,11 +218,86 @@ class NotificacionThread extends Thread {
                 }
             };
             t.purge();
-            if (tipo.equalsIgnoreCase("guardia")) {
-                t.schedule(timerTask, 500, 5000);
-            }
-
-
+            t.schedule(timerTask, 500, 50000);
+            return latitud;
+        } else {
+            return 0.0;
         }
+    }
+
+    public void stopAlerta() {
+        if (timerTask != null) {
+            timerTask.detenme();
+            nCounter = 0;
+        }
+    }
+
+    private void sendNotification(final String idGuardia) {
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                int SDK_INT = android.os.Build.VERSION.SDK_INT;
+                if (SDK_INT > 8) {
+                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                            .permitAll().build();
+                    StrictMode.setThreadPolicy(policy);
+
+                    try {
+                        String jsonResponse;
+
+                        URL url = new URL("https://onesignal.com/api/v1/notifications");
+                        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                        con.setUseCaches(false);
+                        con.setDoOutput(true);
+                        con.setDoInput(true);
+
+                        con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                        con.setRequestProperty("Authorization", "Basic YmE3MjhiYzMtMjQ4NS00MjZjLWI4ODktMjc2MDU0MjU2MDc1");
+                        con.setRequestMethod("POST");
+
+                        String strJsonBody = "{"
+                                + "\"app_id\": \"2ba7353e-2b75-4597-9e77-689f600c0b75\","
+
+                                + "\"filters\": [{\"field\": \"tag\", \"key\": \"idUser\", \"relation\": \"=\", \"value\": \"" + idGuardia + "\"}],"
+
+                                + "\"data\": {\"foo\": \"bar\"},"
+                                + "\"contents\": {\"en\": \"Alguien necesita tu ayuda...\"}"
+                                + "}";
+
+
+                        System.out.println("strJsonBody:\n" + strJsonBody);
+
+                        byte[] sendBytes = strJsonBody.getBytes("UTF-8");
+                        con.setFixedLengthStreamingMode(sendBytes.length);
+
+                        OutputStream outputStream = con.getOutputStream();
+                        outputStream.write(sendBytes);
+
+                        int httpResponse = con.getResponseCode();
+                        System.out.println("httpResponse: " + httpResponse);
+
+                        if (httpResponse >= HttpURLConnection.HTTP_OK
+                                && httpResponse < HttpURLConnection.HTTP_BAD_REQUEST) {
+                            Scanner scanner = new Scanner(con.getInputStream(), "UTF-8");
+                            jsonResponse = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                            scanner.close();
+                        } else {
+                            Scanner scanner = new Scanner(con.getErrorStream(), "UTF-8");
+                            jsonResponse = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                            scanner.close();
+                        }
+                        System.out.println("jsonResponse:\n" + jsonResponse);
+
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    public static abstract class TimerTaskAlerta extends TimerTask {
+        public abstract void detenme();
     }
 }

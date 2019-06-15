@@ -23,6 +23,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
@@ -46,10 +47,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.onesignal.OneSignal;
 
 import group.jedai.panic.R;
 import group.jedai.panic.background.AdmAlerta;
-import group.jedai.panic.background.Alertas;
+import group.jedai.panic.background.AlertaActService;
 import group.jedai.panic.utils.AdmSession;
 import group.jedai.panic.utils.MyReceiver;
 
@@ -94,13 +96,19 @@ public class MenuMapActivity extends AppCompatActivity
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         admSession = new AdmSession(getApplicationContext());
-//        admAlerta = new AdmAlerta(getApplicationContext());
-
 
         nombre = " ";
         tipo = getIntent().getStringExtra("tipo");
         idUser = getIntent().getStringExtra("idUser");
         email = getIntent().getStringExtra("email");
+
+        //OneSignal
+        OneSignal.startInit(this)
+                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+                .unsubscribeWhenNotificationsAreDisabled(true)
+                .init();
+        OneSignal.sendTag("idUser", idUser);
+
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -134,31 +142,18 @@ public class MenuMapActivity extends AppCompatActivity
             return;
         }
         start();
-//        emitirUbicacion();
 
         latitud1 = getIntent().getDoubleExtra("latitud1", 0.0);
         longitud1 = getIntent().getDoubleExtra("longitud1", 0.0);
         latitudG = getIntent().getDoubleExtra("latitudG", 0.0);
         longitudG = getIntent().getDoubleExtra("longitudG", 0.0);
-        if ((latitud1 != 0.0) || (longitud1 != 0.0) || (latitudG != 0.0) || (longitudG != 0.0)) {
-            //onMapActualizar(mMap, latitud1, longitud1, latitudG, longitudG);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            initServicioAct();
+        }else{
+            iniciarServicio();
         }
-
-//        Intent service = new Intent(MenuMapActivity.this, ListenerNotificacion.class);
-//        startService(service);
-
-//        startService(new Intent(this, AdmAlerta.class));
-
-
-//        Intent intent = new Intent(this, Alertas.class);
-//        intent.putExtra("tipo", tipo);
-//        intent.putExtra("idUser", idUser);
-//        intent.putExtra("email", email);
-//        intent.putExtra("latitud", latitud);
-//        intent.putExtra("longitud", longitud);
-//        startService(intent);
-iniciarServicio();
-
     }
 
     public void iniciarServicio(){
@@ -172,9 +167,18 @@ iniciarServicio();
         final PendingIntent pIntent = PendingIntent.getBroadcast(this, MyReceiver.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         long millis = System.currentTimeMillis();
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, millis, 1000, pIntent);
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, millis, 10000, pIntent);
     }
 
+    public void initServicioAct(){
+        Intent intent = new Intent(getApplicationContext(), AlertaActService.class);
+        intent.putExtra("tipo", tipo);
+        intent.putExtra("idUser", idUser);
+        intent.putExtra("email", email);
+        intent.putExtra("latitud", latitud);
+        intent.putExtra("longitud", longitud);
+        ContextCompat.startForegroundService(getApplicationContext(), intent);
+    }
 
     private boolean isLocationEnabled() {
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
@@ -238,6 +242,10 @@ iniciarServicio();
                 if (location != null) {
                     longitud = location.getLongitude();
                     latitud = location.getLatitude();
+
+                    editPref.putString("longitud", String.valueOf(longitud));
+                    editPref.putString("latitud", String.valueOf(latitud));
+                    editPref.commit();
                 }
             }
             while (location == null || location.getLongitude() == 0.0 && location.getLatitude() == 0.0);
@@ -272,6 +280,10 @@ iniciarServicio();
                 if (location != null) {
                     longitud = location.getLongitude();
                     latitud = location.getLatitude();
+
+                    editPref.putString("longitud", String.valueOf(longitud));
+                    editPref.putString("latitud", String.valueOf(latitud));
+                    editPref.commit();
                 }
             }
             while (location == null || location.getLongitude() == 0.0 && location.getLatitude() == 0.0);
@@ -331,7 +343,7 @@ iniciarServicio();
     }
 
     public void emitirUbicacion() {
-//        admAlerta.emitirUbicacion(idUser, tipo, latitud, longitud, mMap);
+        admAlerta.emitirUbicacionGuardia(idUser, tipo, latitud, longitud);
     }
 
     public void notificacion() {
@@ -352,7 +364,6 @@ iniciarServicio();
         //interfaz de notificacion
         RemoteViews view = new RemoteViews(getPackageName(), R.layout.activity_notificacion);
         view.setOnClickPendingIntent(R.id.btnNotificacion, pendingIntent);
-        //        view.setImageViewResource(R.drawable.ic_menu_camera, R.drawable.ic_menu_gallery);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID);
         mBuilder.setAutoCancel(false);

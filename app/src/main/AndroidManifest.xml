@@ -20,13 +20,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <service
+            android:name=".background.AlertaActService"
+            android:exported="false"></service>
+
         <receiver
             android:name=".utils.MyReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true" />
 
         <service
-            android:name=".background.Alertas"
+            android:name=".background.AlertasService"
             android:exported="false" />
         <service
             android:name=".background.AdmAlerta"

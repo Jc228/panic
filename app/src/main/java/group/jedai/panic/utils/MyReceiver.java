@@ -5,9 +5,8 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.widget.Toast;
 
-import group.jedai.panic.background.Alertas;
+import group.jedai.panic.background.AlertasService;
 
 public class MyReceiver extends BroadcastReceiver {
     public static final int REQUEST_CODE = 12345;
@@ -16,18 +15,18 @@ public class MyReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Intent i = new Intent(context, Alertas.class);
-        Toast.makeText(context,"Corriendo", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(context, AlertasService.class);
+//        Toast.makeText(context,"Corriendo", Toast.LENGTH_SHORT).show();
         i.putExtra("tipo",intent.getStringExtra("tipo"));
         i.putExtra("idUser",intent.getStringExtra("idUser"));
         i.putExtra("email",intent.getStringExtra("email"));
         i.putExtra("latitud",intent.getDoubleExtra("latitud",0.0));
-        i.putExtra("longitus",intent.getDoubleExtra("longitud",0.0));
+        i.putExtra("longitud",intent.getDoubleExtra("longitud",0.0));
 
         final PendingIntent pIntent = PendingIntent.getBroadcast(context, MyReceiver.REQUEST_CODE, i, PendingIntent.FLAG_UPDATE_CURRENT);
         long millis = System.currentTimeMillis();
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, millis, 1000, pIntent);
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, millis, 5000, pIntent);
         context.startService(i);
     }
 

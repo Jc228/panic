@@ -82,7 +82,7 @@ public class MenuActivity extends AppCompatActivity
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         admSession = new AdmSession(getApplicationContext());
-        admAlerta= new AdmAlerta(getApplicationContext());
+        admAlerta = new AdmAlerta(getApplicationContext());
 
         nombre = getIntent().getStringExtra("nombre");
         tipo = getIntent().getStringExtra("tipo");
@@ -165,7 +165,7 @@ public class MenuActivity extends AppCompatActivity
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         locationManager.requestLocationUpdates(
@@ -179,7 +179,7 @@ public class MenuActivity extends AppCompatActivity
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         locationManager.requestLocationUpdates(
@@ -257,7 +257,7 @@ public class MenuActivity extends AppCompatActivity
         LatLng ubicacionG = new LatLng(latitudG, longitudG);
         map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.hombre)).position(ubicacion).title(nombre));
 //        if(longitud !=0.0 && latitud != 0.0 ) {
-            map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacionG).title(nombre));
+        map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacionG).title(nombre));
 //        }
         camera = CameraUpdateFactory.newLatLngZoom(ubicacion, 16);
         map.animateCamera(camera);
@@ -287,15 +287,18 @@ public class MenuActivity extends AppCompatActivity
 
     public void emitirUbicacion() {
 //admAlerta.enviarAlerta();
-        final double[] lat = {0.0};
-        lat[0] = admAlerta.emitirUbicacion(idUser, tipo, latitud, longitud, true, mMap);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (lat[0] == 0.0) {
+                while (latitud == 0.0) {
                     start();
-                    lat[0] = admAlerta.emitirUbicacion(idUser, tipo, latitud, longitud, true, mMap);
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+                admAlerta.emitirUbicacion(idUser, tipo, latitud, longitud, true, mMap);
             }
         }).start();
     }
@@ -437,8 +440,8 @@ public class MenuActivity extends AppCompatActivity
 //        mMap.setMyLocationEnabled(true);
         nombre = getIntent().getStringExtra("nombre");
         tipo = getIntent().getStringExtra("tipo");
-        System.out.println("long: "+longitud+"lat: " +latitud);
-        if ((longitud == 0.0)  || (latitud == 0.0)){
+        System.out.println("long: " + longitud + "lat: " + latitud);
+        if ((longitud == 0.0) || (latitud == 0.0)) {
             toggleGPSUpdates();
         }
         LatLng ubicacion = new LatLng(latitud, longitud);

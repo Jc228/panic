@@ -151,7 +151,7 @@ public class AdmAlerta extends Service {
 
 
     @TargetApi(Build.VERSION_CODES.O)
-    public double emitirUbicacion(final String idUser, final String tipo, final double latitud, final double longitud, final boolean activo, final GoogleMap googleMap) {
+    public void emitirUbicacion(final String idUser, final String tipo, final double latitud, final double longitud, final boolean activo, final GoogleMap googleMap) {
         if (latitud != 0.0) {
             timerTask = new TimerTaskAlerta() {
 
@@ -200,7 +200,7 @@ public class AdmAlerta extends Service {
                                                 if ((alert.getLongitudeG() != null) || (alert.getLatitudeG() != null)) {
                                                     menuActivity.onMapActualizar(googleMap, alert.getLatitude(), alert.getLongitude(), alert.getLatitudeG(), alert.getLongitudeG());
                                                 }
-//                                                else if(emitir == false){
+//                                                else {
 //                                                    menuActivity.onMapActualizar(googleMap, alert.getLatitude(), alert.getLongitude(), 0.0, 0.0);
 //                                                }
                                             }
@@ -218,11 +218,10 @@ public class AdmAlerta extends Service {
                 }
             };
             t.purge();
-            t.schedule(timerTask, 500, 50000);
-            return latitud;
-        } else {
-            return 0.0;
+            t.schedule(timerTask, 500, 30000);
+//            return timerTask;
         }
+//        return null;
     }
 
     public void stopAlerta() {

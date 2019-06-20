@@ -22,6 +22,12 @@
             android:icon="@drawable/ic_menu_send"
             android:title="Cambiar Contraseña"
             android:theme="@style/BotonesView" />
+
+        <item
+            android:id="@+id/nav_stopAlert"
+            android:icon="@drawable/ic_media_stop_light"
+            android:title="Parar Alerta"
+            android:theme="@style/BotonesViewStop" />
     </group>
     <item android:title="Salir">
         <menu>

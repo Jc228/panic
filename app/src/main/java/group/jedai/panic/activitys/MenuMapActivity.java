@@ -104,7 +104,7 @@ public class MenuMapActivity extends AppCompatActivity
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         admSession = new AdmSession(getApplicationContext());
 
-        nombre = " ";
+        nombre = getIntent().getStringExtra("nombre");
         tipo = getIntent().getStringExtra("tipo");
         idUser = getIntent().getStringExtra("idUser");
         email = getIntent().getStringExtra("email");
@@ -182,8 +182,8 @@ public class MenuMapActivity extends AppCompatActivity
                 map.clear();
                 LatLng ubicacion = new LatLng(latitud, longitud);
                 LatLng ubicacionG = new LatLng(latitudG, longitudG);
-                map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.hombre)).position(ubicacion).title("ESTUDISNTE"));
-                map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacionG).title("GUARDIA"));
+                map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.hombre)).position(ubicacion).title("Alerta"));
+                map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacionG).title(nombre));
                 camera = CameraUpdateFactory.newLatLngZoom(ubicacion, 16);
                 map.animateCamera(camera);
             }
@@ -530,7 +530,7 @@ public class MenuMapActivity extends AppCompatActivity
         map.clear();
         LatLng ubicacion = new LatLng(latitud, longitud);
         LatLng ubicacionG = new LatLng(latitudG, longitudG);
-        map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.hombre)).position(ubicacion).title(nombre));
+        map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.hombre)).position(ubicacion).title("Alerta"));
         map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacionG).title(nombre));
         camera = CameraUpdateFactory.newLatLngZoom(ubicacion, 16);
         map.animateCamera(camera);

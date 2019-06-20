@@ -3,16 +3,12 @@ package group.jedai.panic.background;
 import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.StrictMode;
-import android.provider.Settings;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,9 +19,7 @@ import org.joda.time.LocalDateTime;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Timer;
@@ -59,7 +53,6 @@ public class AdmAlerta extends Service {
     private static final int ID = 51624;
     private MenuActivity menuActivity = new MenuActivity();
     private AdmSession admSession;
-    List<String> mSelectedItems;
 
     private MessageService messageService = new MessageService();
 
@@ -170,12 +163,14 @@ public class AdmAlerta extends Service {
                                     enviar = false;
                                     yomismo.cancel();
                                     //nivel de servicios
-
-                                    Intent intent = new Intent(context, NivelServicioActivity.class);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//para versiones menores a android 6
-                                    intent.putExtra("idA", alertaId);
-                                    context.startActivity(intent);
+                                    if (alertaId != null) {
+                                        Intent intent = new Intent(context, NivelServicioActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//para versiones menores a android 6
+                                        intent.putExtra("idA", alertaId);
+                                        context.startActivity(intent);
+                                    }
                                 }
+
                                 AlertaSrv alertaSrv = retrofit.create(AlertaSrv.class);
                                 final Alerta alerta = new Alerta(idUser, LocalDateTime.now().toString(), latitud, longitud, null, null, null, null, null, emitir);
                                 alerta.setId(alertaId);
@@ -219,7 +214,7 @@ public class AdmAlerta extends Service {
     }
 
     private void sendNotification(final String idGuardia, final String nombre, final String tipo) {
-        final String msm = tipo.toUpperCase() + ": " + nombre+ " necesita ayuda.";
+        final String msm = tipo.toUpperCase() + ": " + nombre + " necesita ayuda.";
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -248,7 +243,7 @@ public class AdmAlerta extends Service {
                                 + "\"filters\": [{\"field\": \"tag\", \"key\": \"idUser\", \"relation\": \"=\", \"value\": \"" + idGuardia + "\"}],"
 
                                 + "\"data\": {\"foo\": \"bar\"},"
-                                + "\"contents\": {\"en\": \"" + msm +"\"}"
+                                + "\"contents\": {\"en\": \"" + msm + "\"}"
                                 + "}";
 
 

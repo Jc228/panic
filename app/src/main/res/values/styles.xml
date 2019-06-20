@@ -35,6 +35,12 @@
         <item name="android:textColor">@color/colorBotonPresionado</item>
     </style>
 
+    <style name="BotonesViewStop" parent="Theme.AppCompat.Light">
+        <item name="colorButtonNormal">@color/colorAccent</item>
+        <item name="android:actionMenuTextColor">@color/colorPeligro</item>
+        <item name="android:itemTextAppearance">@color/colorPeligro</item>
+    </style>
+
     <style name="BotonRegistro" parent="Theme.AppCompat.Light">
         <item name="colorButtonNormal">@color/colorBotonReg</item>
         <item name="colorControlHighlight">@color/colorBotonPresionadoReg</item>

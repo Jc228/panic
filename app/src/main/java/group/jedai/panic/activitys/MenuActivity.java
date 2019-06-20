@@ -425,6 +425,13 @@ public class MenuActivity extends AppCompatActivity
             Intent intent = new Intent(this, CambiarPassActivity.class);
             intent.putExtra("idUser", idUser);
             startActivity(intent);
+        }else if (id == R.id.nav_stopAlert) {
+            mMap.clear();
+            LatLng ubicacion = new LatLng(latitud, longitud);
+            mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.hombre)).position(ubicacion).title(nombre));
+            cameraUpdate = CameraUpdateFactory.newLatLngZoom(ubicacion, 14);
+            mMap.animateCamera(cameraUpdate);
+            stopAlerta();
         } else if (id == R.id.nav_cerrar) {
             admSession.borrarSesion();
 //            admAlerta.stopAlerta();

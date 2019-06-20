@@ -29,6 +29,7 @@ public class StompClient extends WebSocketListener {
     public void connect(String address) {
         OkHttpClient client = new OkHttpClient.Builder()
                 .readTimeout(0, TimeUnit.MILLISECONDS)
+                .pingInterval(10, TimeUnit.SECONDS)
                 .build();
 
         Request request = new Request.Builder()

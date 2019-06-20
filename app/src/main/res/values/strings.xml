@@ -7,6 +7,18 @@
     <string name="recuperar">Recupera tu cuenta</string>
     <string name="cambiarClave">Cambiar contraseña</string>
     <string name="enviar">Enviar</string>
+    <string name="tituloServicio">Motivo de su Alerta</string>
+    <string name="tituloNivelServicio">Su alerta fue</string>
+
+    <string name="razon1">Robo</string>
+    <string name="razon2">Acoso</string>
+    <string name="razon3">Error</string>
+    <string name="razon4">Otro</string>
+
+    <string name="nv1">Atendida</string>
+    <string name="nv2">No atendida</string>
+    <string name="nv3">Guardia tardo mucho</string>
+    <string name="nv4">Guardia nunca llegó</string>
 
     <string name="clvActual">Contraseña actual...</string>
     <string name="clv1">Nueva contraseña...</string>
@@ -15,7 +27,7 @@
 
     <string name="button">Registrar Usuario</string>
     <string name="buttonRegistro">Registrarse</string>
-    <string name="buttonLogin">Loguearse</string>
+    <string name="buttonLogin">Iniciar sesión</string>
     <string name="buttonPeligro">! Ayuda !</string>
     <string name="buttonCerrarSesion">Cerrar Sesion</string>
     <string name="title_activity_maps">Map</string>

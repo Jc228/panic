@@ -155,7 +155,7 @@ public class AlertaActService extends IntentService {
                                     public void onResponse(Call<Notificacion> call, Response<Notificacion> response) {
                                         if (response.isSuccessful()) {
                                             Log.i("Servicio", notificacion.getIdUsuario());
-                                            Toast.makeText(getApplicationContext(), "Ubicacion actualizada" + notificacion.getIdUsuario(), Toast.LENGTH_LONG).show();
+//                                            Toast.makeText(getApplicationContext(), "Ubicacion actualizada" + notificacion.getIdUsuario(), Toast.LENGTH_LONG).show();
                                         }
                                     }
 

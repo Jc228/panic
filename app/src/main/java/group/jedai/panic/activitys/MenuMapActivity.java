@@ -25,6 +25,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -46,12 +47,16 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.onesignal.OneSignal;
+
+import java.util.HashMap;
 
 import group.jedai.panic.R;
 import group.jedai.panic.background.AdmAlerta;
 import group.jedai.panic.background.AlertaActService;
+import group.jedai.panic.srv.MessageService;
 import group.jedai.panic.utils.AdmSession;
 import group.jedai.panic.utils.MyReceiver;
 
@@ -79,6 +84,8 @@ public class MenuMapActivity extends AppCompatActivity
     private static final int ID = 51623;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editPref;
+    private MessageService messageService = new MessageService();
+    private HashMap<String, Marker> hashMapMarker = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,12 +158,45 @@ public class MenuMapActivity extends AppCompatActivity
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             initServicioAct();
-        }else{
+        } else {
             iniciarServicio();
+        }
+
+    }
+
+    private void suscribeSocket(String idUser, GoogleMap mMap) {
+        messageService.connect(idUser, mMap, new ICallback() {
+
+            @Override
+            public void run(final GoogleMap googleMap, final Double latitude, final Double longitude, final Double latitudeG, final Double longitudeG) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        onMapActualizar(googleMap, latitud, longitude, latitudeG, longitudeG);
+                    }
+                });
+            }
+
+            public void onMapActualizar(GoogleMap map, double latitud, double longitud, double latitudG, double longitudG) {
+                CameraUpdate camera;
+                map.clear();
+                LatLng ubicacion = new LatLng(latitud, longitud);
+                LatLng ubicacionG = new LatLng(latitudG, longitudG);
+                map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.hombre)).position(ubicacion).title("ESTUDISNTE"));
+                map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacionG).title("GUARDIA"));
+                camera = CameraUpdateFactory.newLatLngZoom(ubicacion, 16);
+                map.animateCamera(camera);
+            }
+        });
+        ;
+        if (messageService.isConnected()) {
+            Log.i("SOCKET:", "Conectado a socket");
+        } else {
+            Log.i("SOCKET:", "No se pudo conectar a socket");
         }
     }
 
-    public void iniciarServicio(){
+    public void iniciarServicio() {
 
         Intent intent = new Intent(getApplicationContext(), MyReceiver.class);
         intent.putExtra("tipo", tipo);
@@ -167,10 +207,10 @@ public class MenuMapActivity extends AppCompatActivity
         final PendingIntent pIntent = PendingIntent.getBroadcast(this, MyReceiver.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         long millis = System.currentTimeMillis();
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, millis, 10000, pIntent);
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, millis, 1000, pIntent);
     }
 
-    public void initServicioAct(){
+    public void initServicioAct() {
         Intent intent = new Intent(getApplicationContext(), AlertaActService.class);
         intent.putExtra("tipo", tipo);
         intent.putExtra("idUser", idUser);
@@ -252,7 +292,14 @@ public class MenuMapActivity extends AppCompatActivity
             System.out.println("longtNet: " + longitud + "latiNet: " + latitud);
             mMap.clear();
             LatLng ubicacion = new LatLng(latitud, longitud);
-            mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacion).title(nombre));
+            Marker marker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacion).title(nombre));
+
+            Marker old = hashMapMarker.get("guardia");
+            if (old != null) {
+                old.remove();
+            }
+            hashMapMarker.put("guardia", marker);
+
             cameraUpdate = CameraUpdateFactory.newLatLngZoom(ubicacion, 16);
             mMap.animateCamera(cameraUpdate);
         }
@@ -288,9 +335,18 @@ public class MenuMapActivity extends AppCompatActivity
             }
             while (location == null || location.getLongitude() == 0.0 && location.getLatitude() == 0.0);
             System.out.println("longt: " + longitud + "lati: " + latitud);
-            mMap.clear();
+
             LatLng ubicacion = new LatLng(latitud, longitud);
-            mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacion).title(nombre));
+            mMap.clear();
+
+            Marker marker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacion).title(nombre));
+
+            Marker old = hashMapMarker.get("guardia");
+            if (old != null) {
+                old.remove();
+            }
+            hashMapMarker.put("guardia", marker);
+
             cameraUpdate = CameraUpdateFactory.newLatLngZoom(ubicacion, 16);
             mMap.animateCamera(cameraUpdate);
         }
@@ -319,7 +375,6 @@ public class MenuMapActivity extends AppCompatActivity
             return;
         } else {
             try {
-//                toggleGPSUpdates();
                 location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if (location == null || location.getLatitude() == 0.0 || location.getLongitude() == 0.0) {
                     toggleGPSUpdates();
@@ -336,7 +391,8 @@ public class MenuMapActivity extends AppCompatActivity
 
 
             } catch (Exception e) {
-                toggleNetworkUpdates();
+//                toggleNetworkUpdates();
+                toggleGPSUpdates();
                 System.out.println("Excepcion: " + e);
             }
         }
@@ -450,8 +506,6 @@ public class MenuMapActivity extends AppCompatActivity
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
-
         mMap = googleMap;
 //        mMap.setMyLocationEnabled(true);
         nombre = getIntent().getStringExtra("nombre");
@@ -460,10 +514,14 @@ public class MenuMapActivity extends AppCompatActivity
         if ((longitud == 0.0) || (latitud == 0.0)) {
             toggleGPSUpdates();
         }
+        mMap.clear();
         LatLng ubicacion = new LatLng(latitud, longitud);
         mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacion).title(nombre));
         cameraUpdate = CameraUpdateFactory.newLatLngZoom(ubicacion, 16);
         mMap.animateCamera(cameraUpdate);
+
+        suscribeSocket(idUser, mMap);
+
     }
 
     public void onMapActualizar(GoogleMap googleMap, double latitud, double longitud, double latitudG, double longitudG) {
@@ -489,5 +547,9 @@ public class MenuMapActivity extends AppCompatActivity
         super.onDestroy();
         emitirUbicacion();
         notificacion();
+    }
+
+    public static interface ICallback {
+        void run(GoogleMap googleMap, Double latitude, Double longitude, Double latitudeG, Double longitudeG);
     }
 }

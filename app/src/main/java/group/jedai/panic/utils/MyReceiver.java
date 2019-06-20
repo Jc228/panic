@@ -16,7 +16,6 @@ public class MyReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Intent i = new Intent(context, AlertasService.class);
-//        Toast.makeText(context,"Corriendo", Toast.LENGTH_SHORT).show();
         i.putExtra("tipo",intent.getStringExtra("tipo"));
         i.putExtra("idUser",intent.getStringExtra("idUser"));
         i.putExtra("email",intent.getStringExtra("email"));

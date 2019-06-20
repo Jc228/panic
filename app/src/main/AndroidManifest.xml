@@ -19,10 +19,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".activitys.NivelServicioActivity"></activity>
+
         <service
             android:name=".background.AlertaActService"
-            android:exported="false"></service>
+            android:exported="false" />
 
         <receiver
             android:name=".utils.MyReceiver"
@@ -71,7 +74,9 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
     </application>
 
 </manifest>

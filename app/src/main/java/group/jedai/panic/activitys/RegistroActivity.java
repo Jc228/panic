@@ -82,14 +82,10 @@ public class RegistroActivity extends AppCompatActivity implements AdapterView.O
         String tipo = spnTipo.getSelectedItem().toString();
         String sexo = spnSexo.getSelectedItem().toString();
         String facu = spnFAcu.getSelectedItem().toString();
-//
+
         if (tipo.equalsIgnoreCase("guardia")) {
-//            spnFAcu.setEnabled(false);
             facu = "universidad";
         }
-//        else{
-//            spnFAcu.setEnabled(true);
-//        }
 
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(nombre) || TextUtils.isEmpty(sexo) || TextUtils.isEmpty(tipo) || TextUtils.isEmpty(facu)) {
             Toast.makeText(this, "Complete todos los campos...", Toast.LENGTH_LONG).show();
@@ -142,15 +138,11 @@ public class RegistroActivity extends AppCompatActivity implements AdapterView.O
 
         if (tipo.equalsIgnoreCase("guardia")) {
             spnFAcu.setEnabled(false);
-//            ArrayAdapter<String> opcFacu = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, guardias);
-//            spnFAcu.setAdapter(opcFacu);
         } else {
             spnFAcu.setEnabled(true);
             ArrayAdapter<String> opcFacu = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, facultades);
             spnFAcu.setAdapter(opcFacu);
         }
-//        ArrayAdapter<String> opcFacu = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, facultades);
-//        spnFAcu.setAdapter(opcFacu);
     }
 
     @Override

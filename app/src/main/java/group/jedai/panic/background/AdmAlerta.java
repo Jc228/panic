@@ -3,6 +3,7 @@ package group.jedai.panic.background;
 import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -10,6 +11,8 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.StrictMode;
+import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,14 +23,16 @@ import org.joda.time.LocalDateTime;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import group.jedai.panic.activitys.MenuActivity;
-import group.jedai.panic.activitys.MenuMapActivity;
+import group.jedai.panic.activitys.NivelServicioActivity;
 import group.jedai.panic.dto.Alerta;
 import group.jedai.panic.dto.Notificacion;
 import group.jedai.panic.srv.AlertaSrv;
@@ -53,8 +58,8 @@ public class AdmAlerta extends Service {
     private static final String CHANNEL_ID = "canal2";
     private static final int ID = 51624;
     private MenuActivity menuActivity = new MenuActivity();
-    private MenuMapActivity menuMapActivity = new MenuMapActivity();
     private AdmSession admSession;
+    List<String> mSelectedItems;
 
     private MessageService messageService = new MessageService();
 
@@ -93,8 +98,6 @@ public class AdmAlerta extends Service {
     }
 
     public void emitirUbicacionGuardia(final String idUser, final String tipo, final double latitud, final double longitud) {
-//        Intent intent = new Intent(context, AdmAlerta.class);
-//        context.startService(intent);
         retrofit = new Retrofit.Builder()
                 .baseUrl(Constantes.URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -117,14 +120,12 @@ public class AdmAlerta extends Service {
                                 public void onResponse(Call<Notificacion> call, Response<Notificacion> response) {
                                     if (response.isSuccessful()) {
                                         Log.i("Servicio", notificacion.getIdUsuario());
-                                        Toast.makeText(context, "Ubicacion actualizada", Toast.LENGTH_LONG).show();
                                     }
                                 }
 
                                 @Override
                                 public void onFailure(Call<Notificacion> call, Throwable t) {
                                     Log.i("Servicio", notificacion.getIdUsuario());
-
                                     Toast.makeText(context, "Ocurrio un problema", Toast.LENGTH_LONG).show();
                                 }
                             });
@@ -133,14 +134,7 @@ public class AdmAlerta extends Service {
                 }
             };
             t.purge();
-            t.schedule(timerTaskguardia, 500, 100000);
-        }
-    }
-
-    public void enviarAlerta() {
-        messageService.connect();
-        if (messageService.isConnected()) {
-            sendNotification("");
+            t.schedule(timerTaskguardia, 500, 40000);
         }
     }
 
@@ -151,7 +145,7 @@ public class AdmAlerta extends Service {
 
 
     @TargetApi(Build.VERSION_CODES.O)
-    public void emitirUbicacion(final String idUser, final String tipo, final double latitud, final double longitud, final boolean activo, final GoogleMap googleMap) {
+    public void emitirUbicacion(final String idUser, final String nombre, final String tipo, final double latitud, final double longitud, final boolean activo, final GoogleMap googleMap) {
         if (latitud != 0.0) {
             timerTask = new TimerTaskAlerta() {
 
@@ -175,6 +169,12 @@ public class AdmAlerta extends Service {
                                 if (!emitir) {
                                     enviar = false;
                                     yomismo.cancel();
+                                    //nivel de servicios
+
+                                    Intent intent = new Intent(context, NivelServicioActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//para versiones menores a android 6
+                                    intent.putExtra("idA", alertaId);
+                                    context.startActivity(intent);
                                 }
                                 AlertaSrv alertaSrv = retrofit.create(AlertaSrv.class);
                                 final Alerta alerta = new Alerta(idUser, LocalDateTime.now().toString(), latitud, longitud, null, null, null, null, null, emitir);
@@ -188,21 +188,10 @@ public class AdmAlerta extends Service {
                                             Alerta alert = response.body();
                                             alertaId = alert.getId();
                                             if (alert.getIdGuardia() != null) {
-//                                            crear notificacion a los guardias
-                                                messageService.connect();
-                                                if (messageService.isConnected()) {
-                                                    sendNotification(alert.getIdGuardia());
-                                                    Log.i("SOCKET:", "Conectado a socket");
-                                                } else {
-                                                    Log.i("SOCKET:", "No se pudo conectar a socket");
-                                                }
-
+                                                sendNotification(alert.getIdGuardia(), nombre, tipo);//envia notificacion al guardia
                                                 if ((alert.getLongitudeG() != null) || (alert.getLatitudeG() != null)) {
                                                     menuActivity.onMapActualizar(googleMap, alert.getLatitude(), alert.getLongitude(), alert.getLatitudeG(), alert.getLongitudeG());
                                                 }
-//                                                else {
-//                                                    menuActivity.onMapActualizar(googleMap, alert.getLatitude(), alert.getLongitude(), 0.0, 0.0);
-//                                                }
                                             }
                                         }
                                     }
@@ -218,10 +207,8 @@ public class AdmAlerta extends Service {
                 }
             };
             t.purge();
-            t.schedule(timerTask, 500, 30000);
-//            return timerTask;
+            t.schedule(timerTask, 500, 7000);
         }
-//        return null;
     }
 
     public void stopAlerta() {
@@ -231,8 +218,8 @@ public class AdmAlerta extends Service {
         }
     }
 
-    private void sendNotification(final String idGuardia) {
-
+    private void sendNotification(final String idGuardia, final String nombre, final String tipo) {
+        final String msm = tipo.toUpperCase() + ": " + nombre+ " necesita ayuda.";
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -261,7 +248,7 @@ public class AdmAlerta extends Service {
                                 + "\"filters\": [{\"field\": \"tag\", \"key\": \"idUser\", \"relation\": \"=\", \"value\": \"" + idGuardia + "\"}],"
 
                                 + "\"data\": {\"foo\": \"bar\"},"
-                                + "\"contents\": {\"en\": \"Alguien necesita tu ayuda...\"}"
+                                + "\"contents\": {\"en\": \"" + msm +"\"}"
                                 + "}";
 
 

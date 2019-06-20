@@ -225,7 +225,6 @@ public class MenuActivity extends AppCompatActivity
                 longitud = location.getLongitude();
                 latitud = location.getLatitude();
             } while (longitud == 0.0 && latitud == 0.0);
-            System.out.println("longt: " + longitud + "lati: " + latitud);
             mMap.clear();
             LatLng ubicacion = new LatLng(latitud, longitud);
             mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.hombre)).position(ubicacion).title(nombre));
@@ -256,9 +255,7 @@ public class MenuActivity extends AppCompatActivity
         LatLng ubicacion = new LatLng(latitud, longitud);
         LatLng ubicacionG = new LatLng(latitudG, longitudG);
         map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.hombre)).position(ubicacion).title(nombre));
-//        if(longitud !=0.0 && latitud != 0.0 ) {
         map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacionG).title(nombre));
-//        }
         camera = CameraUpdateFactory.newLatLngZoom(ubicacion, 16);
         map.animateCamera(camera);
     }
@@ -271,7 +268,6 @@ public class MenuActivity extends AppCompatActivity
             return;
         } else {
             try {
-//                toggleGPSUpdates();
                 location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 latitud = location.getLatitude();
                 longitud = location.getLongitude();
@@ -279,6 +275,7 @@ public class MenuActivity extends AppCompatActivity
                     toggleGPSUpdates();
                 }
             } catch (Exception e) {
+//                toggleNetworkUpdates();
                 toggleNetworkUpdates();
                 System.out.println("Excepcion: " + e);
             }
@@ -286,7 +283,6 @@ public class MenuActivity extends AppCompatActivity
     }
 
     public void emitirUbicacion() {
-//admAlerta.enviarAlerta();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -298,7 +294,7 @@ public class MenuActivity extends AppCompatActivity
                         e.printStackTrace();
                     }
                 }
-                admAlerta.emitirUbicacion(idUser, tipo, latitud, longitud, true, mMap);
+                admAlerta.emitirUbicacion(idUser,nombre, tipo, latitud, longitud, true, mMap);
             }
         }).start();
     }
@@ -365,6 +361,11 @@ public class MenuActivity extends AppCompatActivity
                 emitirUbicacion();
                 break;
             case R.id.button:
+                mMap.clear();
+                LatLng ubicacion = new LatLng(latitud, longitud);
+                mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.hombre)).position(ubicacion).title(nombre));
+                cameraUpdate = CameraUpdateFactory.newLatLngZoom(ubicacion, 14);
+                mMap.animateCamera(cameraUpdate);
                 stopAlerta();
                 break;
         }
@@ -437,7 +438,6 @@ public class MenuActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-//        mMap.setMyLocationEnabled(true);
         nombre = getIntent().getStringExtra("nombre");
         tipo = getIntent().getStringExtra("tipo");
         System.out.println("long: " + longitud + "lat: " + latitud);
@@ -460,7 +460,6 @@ public class MenuActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        emitirUbicacion();
         notificacion();
     }
 

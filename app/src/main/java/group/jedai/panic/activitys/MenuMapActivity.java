@@ -120,15 +120,15 @@ public class MenuMapActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Mostrar algun dato...", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                mMap.clear();
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Mostrar algun dato...", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//                mMap.clear();
+//            }
+//        });
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -486,11 +486,11 @@ public class MenuMapActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_cambiar) {
+//        if (id == R.id.nav_camera) {
+//            // Handle the camera action
+//        } else if (id == R.id.nav_gallery) {
+//        }else
+        if (id == R.id.nav_cambiar) {
             Intent intent = new Intent(this, CambiarPassActivity.class);
             intent.putExtra("idUser", idUser);
             startActivity(intent);

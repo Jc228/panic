@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -49,15 +50,19 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.onesignal.OneSignal;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import group.jedai.panic.R;
 import group.jedai.panic.background.AdmAlerta;
 import group.jedai.panic.background.AlertaActService;
 import group.jedai.panic.srv.MessageService;
 import group.jedai.panic.utils.AdmSession;
+import group.jedai.panic.utils.DibujarRuta;
 import group.jedai.panic.utils.MyReceiver;
 
 public class MenuMapActivity extends AppCompatActivity
@@ -86,12 +91,13 @@ public class MenuMapActivity extends AppCompatActivity
     private SharedPreferences.Editor editPref;
     private MessageService messageService = new MessageService();
     private HashMap<String, Marker> hashMapMarker = new HashMap<>();
+//    private DibujarRuta dibujarRuta;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_map);
-
+//        dibujarRuta = new DibujarRuta(getApplicationContext());
         int permissions_code = 42;
         String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
 
@@ -119,16 +125,6 @@ public class MenuMapActivity extends AppCompatActivity
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Mostrar algun dato...", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//                mMap.clear();
-//            }
-//        });
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -178,17 +174,21 @@ public class MenuMapActivity extends AppCompatActivity
             }
 
             public void onMapActualizar(GoogleMap map, double latitud, double longitud, double latitudG, double longitudG) {
+
                 CameraUpdate camera;
                 map.clear();
+
+
                 LatLng ubicacion = new LatLng(latitud, longitud);
                 LatLng ubicacionG = new LatLng(latitudG, longitudG);
                 map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.hombre)).position(ubicacion).title("Alerta"));
                 map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacionG).title(nombre));
+                map.addPolyline(new PolylineOptions().add(ubicacion, ubicacionG).width(4).color(Color.BLUE));
                 camera = CameraUpdateFactory.newLatLngZoom(ubicacion, 16);
                 map.animateCamera(camera);
             }
         });
-        ;
+
         if (messageService.isConnected()) {
             Log.i("SOCKET:", "Conectado a socket");
         } else {
@@ -486,10 +486,6 @@ public class MenuMapActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-//        if (id == R.id.nav_camera) {
-//            // Handle the camera action
-//        } else if (id == R.id.nav_gallery) {
-//        }else
         if (id == R.id.nav_cambiar) {
             Intent intent = new Intent(this, CambiarPassActivity.class);
             intent.putExtra("idUser", idUser);

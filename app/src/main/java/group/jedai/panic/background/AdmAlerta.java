@@ -127,7 +127,7 @@ public class AdmAlerta extends Service {
                 }
             };
             t.purge();
-            t.schedule(timerTaskguardia, 500, 40000);
+            t.schedule(timerTaskguardia, 500, 30000);
         }
     }
 
@@ -202,7 +202,7 @@ public class AdmAlerta extends Service {
                 }
             };
             t.purge();
-            t.schedule(timerTask, 500, 7000);
+            t.schedule(timerTask, 500, 6000);
         }
     }
 

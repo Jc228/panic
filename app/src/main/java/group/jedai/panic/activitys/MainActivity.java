@@ -112,8 +112,8 @@ public class MainActivity extends AppCompatActivity {
                 loginUsuario();
                 break;
             case R.id.btnOlvido:
-//                Intent intent = new Intent(this, ResetearActivity.class);
-//                startActivity(intent);
+                Intent intent = new Intent(this, ResetearActivity.class);
+                startActivity(intent);
                 break;
         }
     }

@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -43,6 +44,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.onesignal.OneSignal;
 
 import group.jedai.panic.R;
@@ -256,6 +258,7 @@ public class MenuActivity extends AppCompatActivity
         LatLng ubicacionG = new LatLng(latitudG, longitudG);
         map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.hombre)).position(ubicacion).title(nombre));
         map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.policeman)).position(ubicacionG).title(nombre));
+        map.addPolyline(new PolylineOptions().add(ubicacion, ubicacionG).width(4).color(Color.BLUE));
         camera = CameraUpdateFactory.newLatLngZoom(ubicacion, 16);
         map.animateCamera(camera);
     }

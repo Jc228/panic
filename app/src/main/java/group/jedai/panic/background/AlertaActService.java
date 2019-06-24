@@ -45,7 +45,7 @@ public class AlertaActService extends IntentService {
     private static final String EXTRA_PARAM2 = "group.jedai.panic.background.extra.PARAM2";
 
     private PowerManager.WakeLock wakeLock;
-    public static final String CHANNEL_ID = "CanalServicio";
+    public static final String CHANNEL_ID = "CanalServicio1";
     TimerTask timerTask;
     final Handler handler = new Handler();
     Timer t = new Timer();

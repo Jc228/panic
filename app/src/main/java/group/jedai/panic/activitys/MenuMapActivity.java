@@ -153,7 +153,7 @@ public class MenuMapActivity extends AppCompatActivity
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            initServicioAct();
+//            initServicioAct();
         } else {
             iniciarServicio();
         }

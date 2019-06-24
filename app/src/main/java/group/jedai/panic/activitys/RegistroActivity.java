@@ -131,7 +131,7 @@ public class RegistroActivity extends AppCompatActivity implements AdapterView.O
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        String[] facultades = {"Ingenieria", "Administracion", "Derecho", "Medicina"};
+        String[] facultades = {"F. Arquitectura y Urbanismo", "F. de Artes", "F. de Ciencias Administrativas", "F. Ciencias de la Discapacidad","F. Ciencias Agrícolas", "F. Ciencias Económicas", "F. Ciencias Médicas", "F. Ciencias Psicológicas", "F. Ciencias Químicas", "F. Comunicación Social", "F. Cultura Física ", "F. Filosofía", "F. Ingeniería en Geologia y Minas", "F. Ingeniería Química", "F. Ingeniería en Ciencias Físicas y M.", "F. Jurisprudencia", "F. Odontología", "F. Medicina Veterinaria"};
         String[] guardias = {"Universidad"};
 
         String tipo = spnTipo.getSelectedItem().toString();

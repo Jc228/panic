@@ -1,18 +1,30 @@
 package group.jedai.panic.background;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.StrictMode;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.joda.time.LocalDateTime;
 
@@ -25,6 +37,7 @@ import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import group.jedai.panic.R;
 import group.jedai.panic.activitys.MenuActivity;
 import group.jedai.panic.activitys.NivelServicioActivity;
 import group.jedai.panic.dto.Alerta;
@@ -53,6 +66,10 @@ public class AdmAlerta extends Service {
     private static final int ID = 51624;
     private MenuActivity menuActivity = new MenuActivity();
     private AdmSession admSession;
+    private LocationManager locationManager;
+    private Location location;
+    private double latitudAct;
+    private double longitudAct;
 
     private MessageService messageService = new MessageService();
 
@@ -66,6 +83,7 @@ public class AdmAlerta extends Service {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         admSession = new AdmSession(context);
+        locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
     }
 
     @Override
@@ -146,6 +164,9 @@ public class AdmAlerta extends Service {
                 private boolean enviar = true;
                 private String alertaId = null;
                 private TimerTaskAlerta yomismo = this;
+                //ubicacion
+                private double lat;
+                private double lon;
 
                 @Override
                 public void detenme() {
@@ -170,9 +191,18 @@ public class AdmAlerta extends Service {
                                         context.startActivity(intent);
                                     }
                                 }
+                                    toggleGPSUpdates();
+
+                                if ((latitud != latitudAct || longitud != longitudAct) && nCounter > 1) {
+                                    lat = latitudAct;
+                                    lon = longitudAct;
+                                } else {
+                                    lat = latitud;
+                                    lon = longitud;
+                                }
 
                                 AlertaSrv alertaSrv = retrofit.create(AlertaSrv.class);
-                                final Alerta alerta = new Alerta(idUser, LocalDateTime.now().toString(), latitud, longitud, null, null, null, null, null, emitir);
+                                final Alerta alerta = new Alerta(idUser, LocalDateTime.now().toString(), lat, lon, null, null, null, null, null, emitir);
                                 alerta.setId(alertaId);
                                 Call<Alerta> alertaCall = alertaSrv.addAlerta(alerta);
                                 alertaCall.enqueue(new Callback<Alerta>() {
@@ -281,4 +311,43 @@ public class AdmAlerta extends Service {
     public static abstract class TimerTaskAlerta extends TimerTask {
         public abstract void detenme();
     }
+
+    public void toggleGPSUpdates() {
+
+        locationManager.removeUpdates(locationListenerGPS);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER, 3000, 10, locationListenerGPS);
+
+    }
+
+
+    private LocationListener locationListenerGPS = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            if (location != null) {
+                longitudAct = location.getLongitude();
+                latitudAct = location.getLatitude();
+            }
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
+
 }

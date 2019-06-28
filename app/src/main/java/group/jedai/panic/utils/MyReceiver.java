@@ -25,7 +25,7 @@ public class MyReceiver extends BroadcastReceiver {
         final PendingIntent pIntent = PendingIntent.getBroadcast(context, MyReceiver.REQUEST_CODE, i, PendingIntent.FLAG_UPDATE_CURRENT);
         long millis = System.currentTimeMillis();
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, millis, 5000, pIntent);
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, millis, 4000, pIntent);
         context.startService(i);
     }
 

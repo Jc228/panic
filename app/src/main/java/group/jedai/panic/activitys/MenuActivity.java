@@ -56,8 +56,6 @@ public class MenuActivity extends AppCompatActivity
 
     private GoogleMap mMap;
     private CameraUpdate cameraUpdate;
-
-    //    private TextView textView;
     private TextView textViewMail;
     private String nombre;
     private String tipo;

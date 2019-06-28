@@ -168,7 +168,7 @@ public class MenuMapActivity extends AppCompatActivity
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        onMapActualizar(googleMap, latitud, longitude, latitudeG, longitudeG);
+                        onMapActualizar(googleMap, latitude, longitude, latitudeG, longitudeG);
                     }
                 });
             }

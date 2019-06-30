@@ -2,7 +2,7 @@ package group.jedai.panic.dto;
 
 import java.io.Serializable;
 
-public class EstadoAlerta implements Serializable {
+public class EstadoAlerta implements Serializable{
     private String id;
     private String nm;
 

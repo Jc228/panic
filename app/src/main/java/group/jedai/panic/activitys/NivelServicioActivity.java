@@ -1,26 +1,22 @@
 package group.jedai.panic.activitys;
 
-import android.app.ProgressDialog;
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import group.jedai.panic.R;
 import group.jedai.panic.dto.EstadoAlerta;
-import group.jedai.panic.dto.EstadoAlertaList;
+import group.jedai.panic.dto.MotivoAlerta;
 import group.jedai.panic.dto.NivelServicio;
 import group.jedai.panic.srv.EstadoAlertaSrv;
+import group.jedai.panic.srv.MotivoAlertaSrv;
 import group.jedai.panic.srv.NivelServicioSrv;
 import group.jedai.panic.utils.Constantes;
 import retrofit2.Call;
@@ -28,6 +24,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import static android.widget.Toast.LENGTH_LONG;
 
 public class NivelServicioActivity extends AppCompatActivity {
     private Retrofit retrofit;
@@ -39,6 +37,7 @@ public class NivelServicioActivity extends AppCompatActivity {
     String motivo = null;
     String niv = null;
     List<String> estados;
+    List<String> motivos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,32 +50,93 @@ public class NivelServicioActivity extends AppCompatActivity {
         idA = getIntent().getStringExtra("idA").toString();
         radioGroup = findViewById(R.id.radioGroup);
         radioGroup1 = findViewById(R.id.radioGroup1);
-        estados = getEstadoss();
+
+//        estados = getEstados();
+//        motivos = getMotivos();
+//
+//        RadioGroup radEstados = (RadioGroup) findViewById(R.id.radioGroup);
+//        RadioGroup radMotivos = (RadioGroup) findViewById(R.id.radioGroup1);
+//        for (String est : estados) {
+//            RadioButton radEstado = crearRadioButton(est);
+//            radioGroup.addView(radEstado);
+//        }
+//        RadioButton primerRadio = (RadioButton) radioGroup.getChildAt(0);
+//        primerRadio.setChecked(true);
+//
+//        for (String mot : motivos) {
+//            RadioButton radMotivo = crearRadioButton(mot);
+//            radioGroup1.addView(radMotivo);
+//        }
+//        RadioButton primerRadio1 = (RadioButton) radioGroup1.getChildAt(0);
+//        primerRadio1.setChecked(true);
+
 
     }
 
-    public List<String> getEstadoss() {
-        final List<String> lista = new ArrayList<>();
-        EstadoAlertaSrv estadoAlertaSrv = retrofit.create(EstadoAlertaSrv.class);
-        Call<EstadoAlertaList> estadoList = estadoAlertaSrv.findAllEstado();
-       estadoList.enqueue(new Callback<EstadoAlertaList>() {
-           @Override
-           public void onResponse(Call<EstadoAlertaList> call, Response<EstadoAlertaList> response) {
-               if(response.isSuccessful()){
-                   EstadoAlertaList estadoAlertaList = response.body();
-                   List<String> estados = estadoAlertaList.getEstados();
-                   for (String nm: estados){
-                       lista.add(nm);
-                   }
-               }
-           }
-           @Override
-           public void onFailure(Call<EstadoAlertaList> call, Throwable t) {
-               Toast.makeText(getApplicationContext(), "No se pudo obtener items", Toast.LENGTH_LONG).show();
-           }
-       });
-        Log.i("ESTADOS: ", lista.toString());
+    public List<String> getEstados() {
+        final ArrayList<String> lista = new ArrayList<>();
+        int i = 0;
+        while (lista.size() == 0) {
+            EstadoAlertaSrv estadoAlertaSrv = retrofit.create(EstadoAlertaSrv.class);
+            Call<List<EstadoAlerta>> listCall = estadoAlertaSrv.findAllEstado();
+            listCall.enqueue(new Callback<List<EstadoAlerta>>() {
+                @Override
+                public void onResponse(Call<List<EstadoAlerta>> call, Response<List<EstadoAlerta>> response) {
+                    if (response.isSuccessful()) {
+                        List<EstadoAlerta> list = response.body();
+                        for (EstadoAlerta est : list) {
+                            lista.add(est.getNm());
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<EstadoAlerta>> call, Throwable t) {
+
+                }
+            });
+
+            i++;
+        }
         return lista;
+    }
+
+    public List<String> getMotivos() {
+        final ArrayList<String> lista = new ArrayList<>();
+        int i = 0;
+        while (lista.size() == 0) {
+            MotivoAlertaSrv motivoAlertaSrv = retrofit.create(MotivoAlertaSrv.class);
+            Call<List<MotivoAlerta>> motListCall = motivoAlertaSrv.findAllMotivo();
+            motListCall.enqueue(new Callback<List<MotivoAlerta>>() {
+                @Override
+                public void onResponse(Call<List<MotivoAlerta>> call, Response<List<MotivoAlerta>> response) {
+                    if (response.isSuccessful()) {
+                        List<MotivoAlerta> list = response.body();
+                        for (MotivoAlerta mot : list) {
+                            lista.add(mot.getNm());
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<MotivoAlerta>> call, Throwable t) {
+                    Toast.makeText(NivelServicioActivity.this, "No hay motivos", Toast.LENGTH_SHORT).show();
+                }
+            });
+            i++;
+        }
+        return lista;
+    }
+
+    private RadioButton crearRadioButton(String marca) {
+        RadioButton nuevoRadio = new RadioButton(this);
+        LinearLayout.LayoutParams params = new RadioGroup.LayoutParams(
+                RadioGroup.LayoutParams.WRAP_CONTENT,
+                RadioGroup.LayoutParams.WRAP_CONTENT);
+        nuevoRadio.setLayoutParams(params);
+        nuevoRadio.setText(marca);
+        nuevoRadio.setTag(marca);
+        return nuevoRadio;
     }
 
     public void enviarNivServicio() {
@@ -95,7 +155,7 @@ public class NivelServicioActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<NivelServicio> call, Response<NivelServicio> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(getApplicationContext(), "Enviado...", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Enviado...", LENGTH_LONG).show();
                     NivelServicio niv = response.body();
                     onBackPressed();
                 }
@@ -103,7 +163,7 @@ public class NivelServicioActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<NivelServicio> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), "Ocurrio un problema", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Ocurrio un problema", LENGTH_LONG).show();
             }
         });
 

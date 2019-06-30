@@ -3,7 +3,7 @@ package group.jedai.panic.utils;
 
 public class Constantes {
 
-//    public final static String IP = "192.168.12.252:8080/";
+//    public final static String IP = "192.168.1.8:8080/";
     public final static String IP = "panic-server.herokuapp.com/";
 
 //    public static final String URL = "http://" + IP + "api/movil/";

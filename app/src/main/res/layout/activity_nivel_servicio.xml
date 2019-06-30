@@ -7,6 +7,7 @@
     tools:context=".activitys.NivelServicioActivity">
 
     <LinearLayout
+        android:id="@+id/lineLay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -16,10 +17,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="30dp"
             android:text="@string/tituloServicio"
             android:textSize="17sp"
             android:textStyle="bold"
-            android:layout_marginTop="30dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -69,13 +70,13 @@
             android:id="@+id/servicioTxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="17sp"
-            android:textStyle="bold"
             android:layout_gravity="center"
             android:layout_marginTop="30dp"
+            android:text="@string/tituloNivelServicio"
+            android:textSize="17sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/radioGroup"
-            android:text="@string/tituloNivelServicio"/>
+            app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
 
         <RadioGroup
             android:id="@+id/radioGroup1"
@@ -122,9 +123,9 @@
             android:id="@+id/enviarNiv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:onClick="clicAction"
-            android:layout_gravity="center"
             android:text="@string/enviar"
             android:theme="@style/MiBotonRaised"
             app:layout_constraintStart_toStartOf="parent"

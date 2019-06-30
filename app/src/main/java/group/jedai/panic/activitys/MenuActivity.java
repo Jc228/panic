@@ -57,6 +57,7 @@ public class MenuActivity extends AppCompatActivity
     private GoogleMap mMap;
     private CameraUpdate cameraUpdate;
     private TextView textViewMail;
+    private TextView textViewNameUser;
     private String nombre;
     private String tipo;
     private String idUser;
@@ -101,7 +102,6 @@ public class MenuActivity extends AppCompatActivity
             Toast.makeText(this, "!!Bienvenido " + nombre + " !!", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Su cuenta no esta acticada se le recomienda activarla", Toast.LENGTH_SHORT).show();
-
         }
 
         Toolbar toolbar = findViewById(R.id.toolbarCli);
@@ -118,8 +118,10 @@ public class MenuActivity extends AppCompatActivity
 
         View header = navigationView.getHeaderView(0);
         textViewMail = (TextView) header.findViewById(R.id.textViewMail);
-        System.out.println(textViewMail.getText());
         textViewMail.setText(email);
+
+        textViewNameUser = (TextView) header.findViewById(R.id.textViewNameUser);
+        textViewNameUser.setText(nombre);
 
         if (!checkLocation()) {
             return;
@@ -295,7 +297,7 @@ public class MenuActivity extends AppCompatActivity
                         e.printStackTrace();
                     }
                 }
-                admAlerta.emitirUbicacion(idUser,nombre, tipo, latitud, longitud, true, mMap);
+                admAlerta.emitirUbicacion(idUser, nombre, tipo, latitud, longitud, true, mMap);
             }
         }).start();
     }
@@ -426,7 +428,7 @@ public class MenuActivity extends AppCompatActivity
             Intent intent = new Intent(this, CambiarPassActivity.class);
             intent.putExtra("idUser", idUser);
             startActivity(intent);
-        }else if (id == R.id.nav_stopAlert) {
+        } else if (id == R.id.nav_stopAlert) {
             mMap.clear();
             LatLng ubicacion = new LatLng(latitud, longitud);
             mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.hombre)).position(ubicacion).title(nombre));

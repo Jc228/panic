@@ -83,6 +83,7 @@ public class MenuMapActivity extends AppCompatActivity
     private String idUser;
     private String email;
     private TextView textViewMail;
+    private TextView textViewNameUserG;
     private AdmAlerta admAlerta;
     private AdmSession admSession;
     private static final String CHANNEL_ID = "canal1";
@@ -122,6 +123,7 @@ public class MenuMapActivity extends AppCompatActivity
                 .init();
         OneSignal.sendTag("idUser", idUser);
 
+        Toast.makeText(this, "!!Bienvenido " + nombre + " !!", Toast.LENGTH_SHORT).show();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -137,6 +139,9 @@ public class MenuMapActivity extends AppCompatActivity
         View header = navigationView.getHeaderView(0);
         textViewMail = (TextView) header.findViewById(R.id.textViewMailG);
         textViewMail.setText(email);
+
+        textViewNameUserG = (TextView) header.findViewById(R.id.textViewNameUserG);
+        textViewNameUserG.setText(nombre);
 
         sharedPreferences = this.getSharedPreferences("datos", Context.MODE_PRIVATE);
         editPref = sharedPreferences.edit();

@@ -20,12 +20,11 @@
 
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="Salir">
         <menu>
             <item
                 android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Cerrar Sesion" />
+                android:title="Cerrar Sesión" />
         </menu>
     </item>
 

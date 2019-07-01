@@ -412,13 +412,15 @@ public class MenuActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_foto) {
-            Intent intent = new Intent(this, FotoActivity.class);
-            intent.putExtra("activity", "menu");
-            intent.putExtra("idUser", idUser);
-            intent.putExtra("mail", email);
-            startActivity(intent);
-        } else if (id == R.id.nav_instrucciones) {
+//        if (id == R.id.nav_foto) {
+//            Intent intent = new Intent(this, FotoActivity.class);
+//            intent.putExtra("activity", "menu");
+//            intent.putExtra("idUser", idUser);
+//            intent.putExtra("mail", email);
+//            startActivity(intent);
+//        }
+//        else
+            if (id == R.id.nav_instrucciones) {
             Intent intent = new Intent(this, VerificacionActivity.class);
             intent.putExtra("activity", "menu");
             intent.putExtra("idUser", idUser);

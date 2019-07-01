@@ -5,12 +5,12 @@
 
     <group android:checkableBehavior="single">
 
-        <item
-            android:id="@+id/nav_foto"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Cambiar fotografía"
-            android:theme="@style/BotonesView"
-            />
+        <!--<item-->
+            <!--android:id="@+id/nav_foto"-->
+            <!--android:icon="@drawable/ic_menu_camera"-->
+            <!--android:title="Cambiar fotografía"-->
+            <!--android:theme="@style/BotonesView"-->
+            <!--/>-->
         <item
             android:id="@+id/nav_instrucciones"
             android:icon="@drawable/ic_menu_manage"
@@ -33,7 +33,7 @@
         <menu>
             <item
                 android:id="@+id/nav_cerrar"
-                android:title="Cerrar Sesion"
+                android:title="Cerrar Sesión"
                 android:theme="@style/BotonesView"/>
         </menu>
     </item>

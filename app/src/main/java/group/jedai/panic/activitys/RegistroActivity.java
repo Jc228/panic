@@ -102,8 +102,10 @@ public class RegistroActivity extends AppCompatActivity implements AdapterView.O
                         Usuario user = response.body();
 
                         Toast.makeText(RegistroActivity.this, "Usuario registrado", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(getApplication(), FotoActivity.class);
-                        intent.putExtra("activity","registro");
+//                        Intent intent = new Intent(getApplication(), FotoActivity.class);
+                        Intent intent = new Intent(getApplication(), VerificacionActivity.class);
+//                        intent.putExtra("activity","registro");
+                        intent.putExtra("activity","foto");
                         intent.putExtra("idUser", user.getId());
                         intent.putExtra("mail", user.getMail());
                         startActivity(intent);
@@ -114,7 +116,7 @@ public class RegistroActivity extends AppCompatActivity implements AdapterView.O
 
                 @Override
                 public void onFailure(Call<Usuario> call, Throwable t) {
-                    Toast.makeText(RegistroActivity.this, "Este correo ya se encuentra registrado", Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegistroActivity.this, "No se pudo registrar su correo", Toast.LENGTH_LONG).show();
                     progressDialog.dismiss();
                 }
             });

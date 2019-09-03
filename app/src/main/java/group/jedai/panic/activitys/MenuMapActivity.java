@@ -110,6 +110,7 @@ public class MenuMapActivity extends AppCompatActivity
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         admSession = new AdmSession(getApplicationContext());
+        admAlerta = new AdmAlerta(getApplicationContext());
 
         nombre = getIntent().getStringExtra("nombre");
         tipo = getIntent().getStringExtra("tipo");

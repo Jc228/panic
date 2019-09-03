@@ -264,7 +264,7 @@ public class AdmAlerta extends Service {
                         con.setDoInput(true);
 
                         con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                        con.setRequestProperty("Authorization", "Basic YmE3MjhiYzMtMjQ4NS00MjZjLWI4ODktMjc2MDU0MjU2MDc1");
+                        con.setRequestProperty("Authorization", Constantes.KEY_ONE_SIGNAL);
                         con.setRequestMethod("POST");
 
                         String strJsonBody = "{"
